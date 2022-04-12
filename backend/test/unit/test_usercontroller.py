@@ -54,10 +54,31 @@ def test_get_user_by_email_valid_email_multiple_existing_users(capsys):
 #     valid_email = "example@example.com"
 #     result = sut.get_user_by_email(valid_email)
 
-#     # Assert, raises IndexError not returning None and prints:
-#     # Error: more than one user found with mail example@example.com, not as docstring says
+#     # Assert, raises IndexError and prints:
+#     # Error: more than one user found with mail example@example.com,
+#     # not returning None, as docstring says
 #     assert result == None
 
+# # Failing test
+# def test_get_user_by_email_valid_email_no_user():
+#     """ test get user by email with valid email and non existing user """
+#     # Arrange
+#     mocked_dao = mock.MagicMock()
+
+#     # What should be mocked since the dao.find seems to be faulty
+#     # Should the dao.find not be mocked?
+#     mocked_dao.find.return_value = None
+#     sut = UserController(dao=mocked_dao)
+
+#     # Act
+#     valid_email = "example@example.com"
+#     result = sut.get_user_by_email(valid_email)
+
+#     # Assert, raises TypeError: object of type 'NoneType' has no len()
+#     # not returning None, as docstring says
+#     assert result == None
+
+# Not failing test, but does not produce expected outcome
 def test_get_user_by_email_valid_email_no_user():
     """ test get user by email with valid email and non existing user """
     # Arrange
