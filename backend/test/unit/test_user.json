@@ -1,0 +1,15 @@
+[
+    {
+    "_id": {
+        "$oid": "624ee0af0606949893fdf626"
+    },
+    "email": "test@test.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "tasks": [
+        {
+            "$oid": "624ee1920606949893fdf629"
+        }
+    ]
+    }
+]
