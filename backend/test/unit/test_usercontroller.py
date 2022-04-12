@@ -36,7 +36,7 @@ def test_get_user_by_email_valid_email_multiple_existing_users(capsys):
     result = sut.get_user_by_email(valid_email)
     captured = capsys.readouterr()
 
-    # Assert
+    # Assert, does this break good practice: Only one assert per test case?
     assert result["email"] == valid_email and captured.out == f'Error: more than one user found with mail {valid_email}\n'
 
 # Failing test
@@ -57,6 +57,24 @@ def test_get_user_by_email_valid_email_multiple_existing_users(capsys):
 #     # Assert, raises IndexError not returning None and prints:
 #     # Error: more than one user found with mail example@example.com, not as docstring says
 #     assert result == None
+
+def test_get_user_by_email_valid_email_no_user():
+    """ test get user by email with valid email and non existing user """
+    # Arrange
+    mocked_dao = mock.MagicMock()
+
+    # What should be mocked since the dao.find seems to be faulty
+    # Should the dao.find not be mocked?
+    mocked_dao.find.return_value = []
+    sut = UserController(dao=mocked_dao)
+
+    # Act
+    valid_email = "example@example.com"
+
+    # Assert
+    with pytest.raises(Exception) as e:
+        sut.get_user_by_email(valid_email)
+
 
 def test_get_user_by_email_invalid_email():
     """ test get user by email with invalid email """
