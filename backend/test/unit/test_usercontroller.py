@@ -4,22 +4,22 @@ import unittest.mock as mock
 from src.controllers.usercontroller import UserController
 
 
-def test_get_user_by_email_valid_email_existing_user():
-    """ test get user by email with valid email and existing user """
-    # Arrange
-    mocked_dao = mock.MagicMock()
-    test_user = json.load(open("./test/unit/test_user.json"))
-    mocked_dao.find.return_value = test_user
-    sut = UserController(dao=mocked_dao)
+# def test_get_user_by_email_valid_email_existing_user():
+#     """ test get user by email with valid email and existing user """
+#     # Arrange
+#     mocked_dao = mock.MagicMock()
+#     test_user = json.load(open("./test/unit/test_user.json"))
+#     mocked_dao.find.return_value = test_user
+#     sut = UserController(dao=mocked_dao)
 
-    # Act
-    valid_email = "test@test.com"
-    result = sut.get_user_by_email(valid_email)
+#     # Act
+#     valid_email = "test@test.com"
+#     result = sut.get_user_by_email(valid_email)
 
-    # Assert
-    assert result["email"] == valid_email
+#     # Assert
+#     assert result["email"] == valid_email
 
-def test_get_user_by_email_valid_email_multiple_existing_users(capsys):
+def test_get_user_by_email_valid_email_multiple_existing_users_output(capsys):
     """ test get user by email with valid email and multiple existing users """
     # Arrange
     mocked_dao = mock.MagicMock()
@@ -32,66 +32,26 @@ def test_get_user_by_email_valid_email_multiple_existing_users(capsys):
     result = sut.get_user_by_email(valid_email)
     captured = capsys.readouterr()
 
-    # Assert, does this break good practice: Only one assert per test case?
-    assert result["email"] == valid_email and captured.out == f'Error: more than one user found with mail {valid_email}\n'
+    # Assert
+    assert captured.out == f'Error: more than one user found with mail {valid_email}\n'
 
 # Failing test
-# def test_get_user_by_email_valid_email_no_user():
-#     """ test get user by email with valid email and non existing user """
-#     # Arrange
-#     mocked_dao = mock.MagicMock()
-
-#     # What should be mocked since the dao.find seems to be faulty
-#     # Should the dao.find not be mocked?
-#     mocked_dao.find.return_value = []
-#     sut = UserController(dao=mocked_dao)
-
-#     # Act
-#     valid_email = "example@example.com"
-#     result = sut.get_user_by_email(valid_email)
-
-#     # Assert, raises IndexError and prints:
-#     # Error: more than one user found with mail example@example.com,
-#     # not returning None, as docstring says
-#     assert result == None
-
-# # Failing test
-# def test_get_user_by_email_valid_email_no_user():
-#     """ test get user by email with valid email and non existing user """
-#     # Arrange
-#     mocked_dao = mock.MagicMock()
-
-#     # What should be mocked since the dao.find seems to be faulty
-#     # Should the dao.find not be mocked?
-#     mocked_dao.find.return_value = None
-#     sut = UserController(dao=mocked_dao)
-
-#     # Act
-#     valid_email = "example@example.com"
-#     result = sut.get_user_by_email(valid_email)
-
-#     # Assert, raises TypeError: object of type 'NoneType' has no len()
-#     # not returning None, as docstring says
-#     assert result == None
-
-# Not failing test, but does not produce expected outcome, should be removed
 def test_get_user_by_email_valid_email_no_user():
     """ test get user by email with valid email and non existing user """
     # Arrange
     mocked_dao = mock.MagicMock()
 
-    # What should be mocked since the dao.find seems to be faulty
-    # Should the dao.find not be mocked?
     mocked_dao.find.return_value = []
     sut = UserController(dao=mocked_dao)
 
     # Act
     valid_email = "example@example.com"
+    result = sut.get_user_by_email(valid_email)
 
-    # Assert
-    with pytest.raises(Exception) as e:
-        sut.get_user_by_email(valid_email)
-
+    # Assert, raises IndexError and prints:
+    # Error: more than one user found with mail example@example.com,
+    # not returning None, as docstring says
+    assert result == None
 
 def test_get_user_by_email_invalid_email():
     """ test get user by email with invalid email """
@@ -113,21 +73,39 @@ def test_get_user_by_email_invalid_email():
     # Assert
     assert error == str(e.value)
 
-# # Failing test
-# def test_get_user_by_email_invalid_datatype():
-#     """ test get user by email with invalid datatype for email """
+# Failing test
+def test_get_user_by_email_invalid_datatype():
+    """ test get user by email with invalid datatype for email """
+    # Arrange
+    mocked_dao = mock.MagicMock()
+
+    # What should be mocked since the dao.find seems to be faulty
+    # Should the dao.find not be mocked? Should exception be raised if no entry is found?
+    mocked_dao.find.return_value = []
+    sut = UserController(dao=mocked_dao)
+
+    # Act
+    invalid_datatype = 123
+
+    # Assert
+    # Throws TypeError: expected string or bytes-like object
+    with pytest.raises(ValueError) as e:
+        assert sut.get_user_by_email(invalid_datatype)
+
+# # Not failing test, but does not produce expected outcome, should be removed
+# def test_get_user_by_email_valid_email_no_user():
+#     """ test get user by email with valid email and non existing user """
 #     # Arrange
 #     mocked_dao = mock.MagicMock()
 
 #     # What should be mocked since the dao.find seems to be faulty
-#     # Should the dao.find not be mocked? Should exception be raised if no entry is found?
+#     # Should the dao.find not be mocked?
 #     mocked_dao.find.return_value = []
 #     sut = UserController(dao=mocked_dao)
 
 #     # Act
-#     invalid_datatype = 123
+#     valid_email = "example@example.com"
 
 #     # Assert
-#     # Throws TypeError: expected string or bytes-like object
-#     with pytest.raises(ValueError) as e:
-#         assert sut.get_user_by_email(invalid_datatype)
+#     with pytest.raises(Exception) as e:
+#         sut.get_user_by_email(valid_email)
