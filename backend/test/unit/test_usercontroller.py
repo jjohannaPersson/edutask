@@ -1,9 +1,5 @@
-# import pytest
-from unittest import result
 import pytest
 import json
-import io
-import sys
 import unittest.mock as mock
 from src.controllers.usercontroller import UserController
 
@@ -78,7 +74,7 @@ def test_get_user_by_email_valid_email_multiple_existing_users(capsys):
 #     # not returning None, as docstring says
 #     assert result == None
 
-# Not failing test, but does not produce expected outcome
+# Not failing test, but does not produce expected outcome, should be removed
 def test_get_user_by_email_valid_email_no_user():
     """ test get user by email with valid email and non existing user """
     # Arrange
@@ -116,3 +112,22 @@ def test_get_user_by_email_invalid_email():
 
     # Assert
     assert error == str(e.value)
+
+# # Failing test
+# def test_get_user_by_email_invalid_datatype():
+#     """ test get user by email with invalid datatype for email """
+#     # Arrange
+#     mocked_dao = mock.MagicMock()
+
+#     # What should be mocked since the dao.find seems to be faulty
+#     # Should the dao.find not be mocked? Should exception be raised if no entry is found?
+#     mocked_dao.find.return_value = []
+#     sut = UserController(dao=mocked_dao)
+
+#     # Act
+#     invalid_datatype = 123
+
+#     # Assert
+#     # Throws TypeError: expected string or bytes-like object
+#     with pytest.raises(ValueError) as e:
+#         assert sut.get_user_by_email(invalid_datatype)
