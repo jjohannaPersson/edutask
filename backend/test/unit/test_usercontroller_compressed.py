@@ -8,7 +8,6 @@ test_users = json.load(open("./test/unit/test_users.json"))
 valid_email = "test@test.com"
 
 # tests for get_user_by_email
-# repetition just to try out fixture and parametrize
 @pytest.fixture
 def sut(json_data: json):
     mocked_dao = mock.MagicMock()
