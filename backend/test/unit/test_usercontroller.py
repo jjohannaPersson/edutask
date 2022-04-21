@@ -11,11 +11,11 @@ from src.controllers.usercontroller import UserController
 #     test_user = json.load(open("./test/unit/test_user.json"))
 #     mocked_dao.find.return_value = test_user
 #     sut = UserController(dao=mocked_dao)
-
+#
 #     # Act
 #     valid_email = "test@test.com"
 #     result = sut.get_user_by_email(valid_email)
-
+#
 #     # Assert
 #     assert result["email"] == valid_email
 
@@ -53,7 +53,7 @@ def test_get_user_by_email_valid_email_no_user():
     # not returning None, as docstring says
     assert result == None
 
-def test_get_user_by_email_invalid_email():
+def test_get_user_by_email_invalid_email_try1():
     """ test get user by email with invalid email """
     # Arrange
     mocked_dao = mock.MagicMock()
@@ -65,6 +65,26 @@ def test_get_user_by_email_invalid_email():
 
     # Act
     invalid_email = "test#test.com"
+    error = "Error: invalid email address"
+
+    with pytest.raises(ValueError) as e:
+        sut.get_user_by_email(invalid_email)
+
+    # Assert
+    assert error == str(e.value)
+
+def test_get_user_by_email_invalid_email_try2():
+    """ test get user by email with invalid email """
+    # Arrange
+    mocked_dao = mock.MagicMock()
+
+    # What should be mocked since the dao.find seems to be faulty
+    # Should the dao.find not be mocked? Should exception be raised if no entry is found?
+    mocked_dao.find.return_value = []
+    sut = UserController(dao=mocked_dao)
+
+    # Act
+    invalid_email = "test@test"
     error = "Error: invalid email address"
 
     with pytest.raises(ValueError) as e:
@@ -109,3 +129,21 @@ def test_get_user_by_email_invalid_datatype():
 #     # Assert
 #     with pytest.raises(Exception) as e:
 #         sut.get_user_by_email(valid_email)
+
+def test_get_user_by_email_raise_exception():
+    """ test get user by email raise Exception """
+    # Arrange
+    mocked_dao = mock.MagicMock()
+
+    # What should be mocked since the dao.find seems to be faulty
+    # Should the dao.find not be mocked? Should exception be raised if no entry is found?
+    mocked_dao.find.side_effect = Exception
+    sut = UserController(dao=mocked_dao)
+
+    # Act
+    valid_email = "hej@hej.com"
+
+    # Assert
+    # Throws TypeError: expected string or bytes-like object
+    with pytest.raises(Exception) as e:
+        sut.get_user_by_email(valid_email)
