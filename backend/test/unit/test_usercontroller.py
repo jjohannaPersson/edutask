@@ -1,26 +1,31 @@
+from logging import exception
 import pytest
 import json
 import unittest.mock as mock
 from src.controllers.usercontroller import UserController
 
+test_user = json.load(open("./test/unit/test_user.json"))
+test_users = json.load(open("./test/unit/test_users.json"))
+valid_email = "test@test.com"
 
-# def test_get_user_by_email_valid_email_existing_user():
-#     """ test get user by email with valid email and existing user """
-#     # Arrange
-#     mocked_dao = mock.MagicMock()
-#     test_user = json.load(open("./test/unit/test_user.json"))
-#     mocked_dao.find.return_value = test_user
-#     sut = UserController(dao=mocked_dao)
+# tests for get_user_by_email
+@pytest.fixture
+def sut(json_data: json):
+    mocked_dao = mock.MagicMock()
+    mocked_dao.find.return_value = json_data
+    mockedsut = UserController(dao=mocked_dao)
+    return mockedsut
 
-#     # Act
-#     valid_email = "test@test.com"
-#     result = sut.get_user_by_email(valid_email)
 
-#     # Assert
-#     assert result["email"] == valid_email
+@pytest.mark.demo
+@pytest.mark.parametrize('json_data, expected', [(test_user, valid_email), (test_users, valid_email)])
+def test_get_user_by_email_valid_email_existing_user(sut, expected):
+    """ test get user by email with valid email """
+    result = sut.get_user_by_email(valid_email)
+    assert result["email"] == expected
 
 def test_get_user_by_email_valid_email_multiple_existing_users_output(capsys):
-    """ test get user by email with valid email and multiple existing users """
+    """ test output of get user by email with valid email and multiple existing users """
     # Arrange
     mocked_dao = mock.MagicMock()
     test_users = json.load(open("./test/unit/test_users.json"))
@@ -29,7 +34,7 @@ def test_get_user_by_email_valid_email_multiple_existing_users_output(capsys):
 
     # Act
     valid_email = "test@test.com"
-    result = sut.get_user_by_email(valid_email)
+    sut.get_user_by_email(valid_email)
     captured = capsys.readouterr()
 
     # Assert
@@ -58,8 +63,6 @@ def test_get_user_by_email_invalid_email():
     # Arrange
     mocked_dao = mock.MagicMock()
 
-    # What should be mocked since the dao.find seems to be faulty
-    # Should the dao.find not be mocked? Should exception be raised if no entry is found?
     mocked_dao.find.return_value = []
     sut = UserController(dao=mocked_dao)
 
@@ -79,8 +82,6 @@ def test_get_user_by_email_invalid_datatype():
     # Arrange
     mocked_dao = mock.MagicMock()
 
-    # What should be mocked since the dao.find seems to be faulty
-    # Should the dao.find not be mocked? Should exception be raised if no entry is found?
     mocked_dao.find.return_value = []
     sut = UserController(dao=mocked_dao)
 
@@ -92,20 +93,17 @@ def test_get_user_by_email_invalid_datatype():
     with pytest.raises(ValueError) as e:
         assert sut.get_user_by_email(invalid_datatype)
 
-# # Not failing test, but does not produce expected outcome, should be removed
-# def test_get_user_by_email_valid_email_no_user():
-#     """ test get user by email with valid email and non existing user """
-#     # Arrange
-#     mocked_dao = mock.MagicMock()
+def test_get_user_by_email_raise_exception():
+    """ test get user by email raise Exception """
+    # Arrange
+    mocked_dao = mock.MagicMock()
 
-#     # What should be mocked since the dao.find seems to be faulty
-#     # Should the dao.find not be mocked?
-#     mocked_dao.find.return_value = []
-#     sut = UserController(dao=mocked_dao)
+    mocked_dao.find.side_effect = Exception
+    sut = UserController(dao=mocked_dao)
 
-#     # Act
-#     valid_email = "example@example.com"
+    # Act
+    valid_email = "example@example.com"
 
-#     # Assert
-#     with pytest.raises(Exception) as e:
-#         sut.get_user_by_email(valid_email)
+    # Assert
+    with pytest.raises(Exception) as e:
+        sut.get_user_by_email(valid_email)
