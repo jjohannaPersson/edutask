@@ -7,7 +7,6 @@ test_user = json.load(open("./test/unit/test_user.json"))
 test_users = json.load(open("./test/unit/test_users.json"))
 valid_email = "test@test.com"
 
-
 @pytest.fixture
 def sut(json_data: json):
     mocked_dao = mock.MagicMock()
@@ -105,7 +104,7 @@ def test_get_user_by_email_raise_exception():
     sut = UserController(dao=mocked_dao)
 
     # Act
-    valid_email = "hej@hej.com"
+    valid_email = "test@test.com"
 
     # Assert
     with pytest.raises(Exception):
