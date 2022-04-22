@@ -38,15 +38,13 @@ class TestFileHandler:
             json.dump(self.json_string, outfile)
 
         # yield instead of return the system under test
-        yield DAO(collection_name="fabricatedFileName")
+        dao = DAO(collection_name="fabricatedFileName")
+        yield dao
 
         # clean up the file after all tests have run
         os.remove(fabricatedFileName)
 
-        client = pymongo.MongoClient("mongodb://localhost:27017/")
-        db = client.edutask
-        collection = db["fabricatedFileName"]
-        collection.drop()
+        dao.drop()
 
     @pytest.mark.demo
     def test_create_valid(self, sut):
@@ -102,19 +100,3 @@ class TestFileHandler:
 
         with pytest.raises(pymongo.errors.WriteError):
             sut.create(data)
-
-    # def test_create_raise_exception(self, sut):
-    #     """ test create raise exception """
-    #     data = {
-    #         "firstName": "Jane",
-    #         "lastName": "Doe",
-    #         "task": [
-    #             "test",
-    #             "test1"
-    #         ]
-    #     }
-    #
-    #     sut.find.side_effect = Exception
-    #
-    #     with pytest.raises(Exception):
-    #         sut.create(data)
