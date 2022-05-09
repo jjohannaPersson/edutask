@@ -29,22 +29,69 @@ describe('Logging into the system', () => {
             })
         cy.visit('http://localhost:3000/')
 
-        // alternative, imperative way of detecting that input field
-        cy.get('.inputwrapper #email')
-        .type('mon.doe@gmail.com')
+        cy.contains('div', 'Email Address')
+            .find('input[type=text]')
+            .type('mon.doe@gmail.com')
 
         // submit the form on this page
         cy.get('form')
             .submit()
         
         // view task in detail mode
-        cy.get(".title-overlay")
+        cy.get("img")
         .first()
         .click()
     })
 
     it('view task in detail mode', () => {
         cy.get('.popup').should('be.visible')
+      })
+
+    it('#1 can add new todo items', () => {
+        // test fails otherwise
+        cy.viewport(1536, 960)
+        const newItem = 'Take notes'
+    
+        // Fails if viewport is not edited
+        // This element <input> is not visible because its ancestor has position: fixed
+        // CSS property and it is overflowed by other elements.
+        // How about scrolling to the element with cy.scrollIntoView()?
+        cy.get('.todo-list')
+        .find('input[type=text]').type(`${newItem}{enter}`)
+    
+    
+        cy.get('.todo-item')
+        .should('have.length', 2)
+        .eq(1)
+        .should('have.text', `${newItem}✖`)
+      })
+
+      it('#2 attempting to add todo with empty input field', () => {
+        // test fails otherwise
+        cy.viewport(1536, 960)
+    
+        // Fails if viewport is not edited
+        // This element <input> is not visible because its ancestor has position: fixed
+        // CSS property and it is overflowed by other elements.
+        // How about scrolling to the element with cy.scrollIntoView()?
+        // cy.get('.todo-list')
+        // .find('input[type=text]').type(`{enter}`)
+
+        cy.get('.todo-list')
+        .find('input[type=submit]')
+        .invoke('attr', 'disabled')
+        .then(disabled =>{
+            disabled ? cy.get('.todo-list').find('input[type=submit]').click({force: true}) : cy.log('buttonIsNotDiabled')
+        })
+
+        // todo should not be added
+        cy.get('.todo-item')
+        .should('have.length', 2)
+
+        // fails, red border does not appear when clicking add button
+        cy.get('.todo-list')
+        .find('input[type=text]')
+        .should('have.css', 'border-color', 'red')
       })
 
 

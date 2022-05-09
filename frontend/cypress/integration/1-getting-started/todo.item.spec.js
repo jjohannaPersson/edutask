@@ -69,6 +69,7 @@ describe('edu view selected task', () => {
   it('can add new todo items', () => {
     const newItem = 'Feed the cat'
 
+    // Fails if viewport is not edited
     // This element <input> is not visible because its ancestor has position: fixed
     // CSS property and it is overflowed by other elements.
     // How about scrolling to the element with cy.scrollIntoView()?
