@@ -43,13 +43,9 @@ describe('Logging into the system', () => {
         .click()
     })
 
-    it('view task in detail mode', () => {
-        cy.get('.popup').should('be.visible')
-      })
-
-    it('R8UC1 #1 can add new todo items', () => {
+    it('R8UC1 #1 can add new todo item to list of one', () => {
         // test fails otherwise
-        cy.viewport(1536, 960)
+        // cy.viewport(1536, 960)
         const newItem = 'Take notes'
     
         // Fails if viewport is not edited
@@ -66,33 +62,46 @@ describe('Logging into the system', () => {
         .should('have.text', `${newItem}✖`)
       })
 
+      /* Failing test
+       Add button is disabled
+       red border does not appear when clicking add button,
+       since button can't be clicked
+       */
       it('R8UC1 #2 attempting to add todo with empty input field', () => {
-        // test fails otherwise
-        // cy.viewport(1536, 960)
-    
-        // Fails if viewport is not edited
-        // This element <input> is not visible because its ancestor has position: fixed
-        // CSS property and it is overflowed by other elements.
-        // How about scrolling to the element with cy.scrollIntoView()?
-        // cy.get('.todo-list')
-        // .find('input[type=text]').type(`{enter}`)
 
         // Fails because element is disabled
-        // cy.get('.todo-list')
-        // .find('input[type=submit]')
-        // .invoke('attr', 'disabled')
-        // .then(disabled =>{
-        //     disabled ? cy.get('.todo-list').find('input[type=submit]').click() : cy.log('buttonIsNotDiabled')
-        // })
+        cy.get('.todo-list')
+        .find('input[type=submit]')
+        .invoke('attr', 'disabled')
+        .then(disabled =>{
+            disabled ? cy.get('.todo-list').find('input[type=submit]').click() : cy.log('buttonIsNotDiabled')
+        })
 
-        // todo should not be added
+        // Not executed, todo should not be added
         cy.get('.todo-item')
         .should('have.length', 2)
 
-        // fails, red border does not appear when clicking add button
-        // cy.get('.todo-list')
-        // .find('input[type=text]')
-        // .should('have.css', 'border-color', 'red')
+        // Not executed, red border should appear
+        cy.get('.todo-list')
+        .find('input[type=text]')
+        .should('have.css', 'border-color', 'red')
+      })
+
+        /* Failing test
+        Fails if viewport is not edited
+        This element <input> is not visible because its ancestor has position: fixed
+        CSS property and it is overflowed by other elements.*/
+      it('R8UC1 #3 can add new todo item to list of two', () => {
+        // cy.viewport(1536, 960)
+        const newItem = 'Discuss topic'
+
+        cy.get('.todo-list')
+        .find('input[type=text]').type(`${newItem}{enter}`)
+    
+        cy.get('.todo-item')
+        .should('have.length', 3)
+        .eq(2)
+        .should('have.text', `${newItem}✖`)
       })
 
     after(function() {

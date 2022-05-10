@@ -56,12 +56,7 @@ describe('Logging into the system', () => {
         .click()
     })
 
-    it('view task in detail mode', () => {
-        cy.get('.popup').should('be.visible')
-      })
-
       it('R8UC3 #1 attempting to delete done todo item from todo list', () => {
-        // should we test if todo is deleted from database or just in screen
 
         // cy.intercept('/todos/byid/*').as('todos')
         // cy.intercept('/tasks/byid/*').as('tasks')
