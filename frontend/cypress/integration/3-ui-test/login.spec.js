@@ -27,50 +27,33 @@ describe('Logging into the system', () => {
                         })
                 })
             })
-        cy.visit('http://localhost:3000/')
+            cy.visit('http://localhost:3000/')
+    })
 
+    it('starting out on the landing screen', () => {
+        // make sure the landing page contains a header with "login"
+        cy.get('h1')
+            .should('contain.text', 'Login')
+    })
+
+    it('login to the system with an existing account', () => {
+        // detect a div which contains "Email Address", find the input and type
+        // declarative
+        cy.contains('div', 'Email Address')
+            .find('input[type=text]')
+            .type('mon.doe@gmail.com')
         // alternative, imperative way of detecting that input field
-        cy.get('.inputwrapper #email')
-        .type('mon.doe@gmail.com')
+        /*cy.get('.inputwrapper #email')
+            .type('mon.doe@gmail.com')*/
 
         // submit the form on this page
         cy.get('form')
             .submit()
-        
-        // view task in detail mode
-        cy.get(".title-overlay")
-        .first()
-        .click()
+
+        // assert that the user is now logged in
+        cy.get('h1')
+            .should('contain.text', 'Your tasks, Mon Doe')
     })
-
-    it('view task in detail mode', () => {
-        cy.get('.popup').should('be.visible')
-      })
-
-    // it('starting out on the landing screen', () => {
-    //     // make sure the landing page contains a header with "login"
-    //     cy.get('h1')
-    //         .should('contain.text', 'Login')
-    // })
-
-    // it('login to the system with an existing account', () => {
-    //     // detect a div which contains "Email Address", find the input and type
-    //     // declarative
-    //     // cy.contains('div', 'Email Address')
-    //     //     .find('input[type=text]')
-    //     //     .type('mon.doe@gmail.com')
-    //     // alternative, imperative way of detecting that input field
-    //     cy.get('.inputwrapper #email')
-    //         .type('mon.doe@gmail.com')
-
-    //     // submit the form on this page
-    //     cy.get('form')
-    //         .submit()
-
-    //     // assert that the user is now logged in
-    //     cy.get('h1')
-    //         .should('contain.text', 'Your tasks, Mon Doe')
-    // })
 
     after(function() {
         // clean up by deleting the user from the database
