@@ -1,4 +1,4 @@
-describe('Logging into the system', () => {
+describe('Test todo', () => {
     before(function() {
         // create a fabricated user from a fixture
         cy.fixture('user.json')
@@ -73,6 +73,31 @@ describe('Logging into the system', () => {
         cy.get('.todo-item')
         .should('have.length', 1)
       })
+
+    //   it('R8UC3 #1 attempting to delete done todo item from todo list', () => {
+
+    //     cy.request({
+    //         method: 'PUT',
+    //         url: `http://localhost:5000/todos/byid/${todoid}`,
+    //         form: true,
+    //         body: {'data': `{'$set': {'done': true}}`},
+    //     }).then((response) => {
+    //         cy.log(response.body[0])
+
+    //         cy.get('.todo-item')
+    //         .first()
+    //         .find('.remover')
+    //         .click()
+    //         .then(() => {
+    //             cy.get('.todo-item')
+    //             .should('have.length', 1)
+    //         })
+    
+    //         // cy.wait(['@todos', '@tasks'])
+    //         // cy.wait(['@tasksByUser'])
+    //     })
+
+    //   })
 
       it('R8UC3 #2 attempting to delete active todo item from todo list', () => {
         cy.get('.todo-item')
