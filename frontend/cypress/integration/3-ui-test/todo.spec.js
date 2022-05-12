@@ -1,54 +1,61 @@
-describe('Test todo', () => {
-    let todoid;
-    before(function() {
-        // create a fabricated user from a fixture
-        cy.fixture('user.json')
-            .then((user) => {
-                cy.request({
-                    method: 'POST',
-                    url: 'http://localhost:5000/users/create',
-                    form: true,
-                    body: user
-                }).then((response) => {
-                    this.uid = response.body._id.$oid
+// let uid;
+let tid;
 
-                    // create one fabricated task for that user
-                    cy.fixture('task.json')
-                        .then((task) => {
-                            // add the user id to the data of the task object
-                            task.userid = this.uid
-                            cy.request({
-                                method: 'POST',
-                                url: 'http://localhost:5000/tasks/create',
-                                form: true,
-                                body: task
-                            }).then((response) => {
-                                this.tid = response.body[0]._id.$oid
-                                // tid = this.tid;
-                                cy.log(response.body[0].todos[0]._id.$oid)
-                                todoid = response.body[0].todos[0]._id.$oid
-                            })
+beforeEach(function() {
+    // create a fabricated user from a fixture
+    cy.fixture('user.json')
+        .then((user) => {
+            cy.request({
+                method: 'POST',
+                url: 'http://localhost:5000/users/create',
+                form: true,
+                body: user
+            }).then((response) => {
+                this.uid = response.body._id.$oid
+                // uid = this.uid;
+
+                // create one fabricated task for user
+                cy.fixture('task.json')
+                    .then((task) => {
+                        // add the user id to the data of the task object
+                        task.userid = this.uid
+                        cy.request({
+                            method: 'POST',
+                            url: 'http://localhost:5000/tasks/create',
+                            form: true,
+                            body: task
+                        }).then((response) => {
+                            this.tid = response.body[0]._id.$oid
+                            tid = this.tid;
+                            cy.log(response.body[0].todos[0]._id.$oid)
+                            this.todoid = response.body[0].todos[0]._id.$oid
                         })
-                })
+                    })
             })
-        cy.visit('http://localhost:3000/')
+        })
+    cy.visit('http://localhost:3000/')
 
-        cy.contains('div', 'Email Address')
-            .find('input[type=text]')
-            .type('mon.doe@gmail.com')
+    // log in user
+    cy.contains('div', 'Email Address')
+        .find('input[type=text]')
+        .type('mon.doe@gmail.com')
 
-        // submit the form on this page
-        cy.get('form')
-            .submit()
-        
-        // view task in detail mode
-        cy.get("img")
-        .first()
-        .click()
+    // submit the form on this page
+    cy.get('form')
+        .submit()
+})
+
+describe('Tests with one todo item in list', () => {
+    beforeEach(function() {
+
+    // view task in detail mode
+    cy.get("img")
+    .first()
+    .click()
     })
 
     it('R8UC1 #1 can add new todo item to list of one', () => {
-        // test that input is empty
+        // test that input is empty before input
         cy.get('.todo-list input[type=text]').should('have.value', '');
 
         const newItem = 'Take notes'
@@ -81,12 +88,57 @@ describe('Test todo', () => {
 
         // Not executed, todo should not be added
         cy.get('.todo-item')
-        .should('have.length', 2)
+        .should('have.length', 1)
 
         // Not executed, red border should appear
         cy.get('.todo-list')
         .find('input[type=text]')
         .should('have.css', 'border-color', 'red')
+    })
+
+    it('R8UC3 #1 attempting to delete active todo item from todo list', () => {
+        // check that todo item is active/unchecked
+        cy.get('.todo-item')
+        .first()
+        .find('.checker')
+        .should('have.class', 'checker unchecked');
+
+        cy.get('.todo-item')
+        .last()
+        .find('.remover')
+        .click()
+        .then(() => {
+            cy.get('.todo-item')
+            .should('not.exist');
+        })
+    })
+
+})
+
+
+
+
+describe('Tests with two todos items in list', () => {
+    // let todoid;
+    beforeEach(function() {
+        // create second fabricated todo set to done
+        cy.fixture('todo.json')
+        .then((todo) => {
+            // add the task id to the data of the todo object
+            todo.taskid = tid
+            cy.request({
+                method: 'POST',
+                url: 'http://localhost:5000/todos/create',
+                form: true,
+                body: todo
+            }).then((response) => {
+                cy.log(response.body[0])
+            })
+        })
+    // view task in detail mode
+    cy.get("img")
+    .first()
+    .click()
     })
 
     /* Failing test
@@ -95,20 +147,26 @@ describe('Test todo', () => {
     CSS property and it is overflowed by other elements.*/
     it('R8UC1 #3 can add new todo item to list of two', () => {
         // cy.viewport(1536, 960)
+
         const newItem = 'Discuss topic'
         cy.get('.todo-list')
         .find('input[type=text]').type(`${newItem}{enter}`)
-    
-        cy.get('.todo-item')
-        .should('have.length', 3)
-        .eq(2)
-        .should('have.text', `${newItem}✖`)
+        .then(() => {
+            cy.get('.todo-item')
+            .should('have.length', 3)
+            .eq(2)
+            .should('have.text', `${newItem}✖`)
+        })
+
     })
 
-    /* Sometimes failing test
-    AssertionError: Expected .editable to have CSS property 'text-decoration'
-    with the value 'line-through' but the value was 'none'. */
     it('R8UC2 #1 Set todo item to done and check if todo item is struck through', () => {
+        // check that todo item is active/unchecked
+        cy.get('.todo-item')
+        .first()
+        .find('.checker')
+        .should('have.class', 'checker unchecked');
+
         cy.get('.todo-item')
         .first()
         .find('.checker')
@@ -120,12 +178,15 @@ describe('Test todo', () => {
         })
     })
 
-    /* Sometimes failing test
-    // AssertionError: Expected .editable to have CSS property 'text-decoration'
-    with the value 'none' but the value was 'line-through' */
     it('R8UC2 #2 Set todo item to active and check if todo item is not struck through', () => {
+        // check that todo item is done/checked
         cy.get('.todo-item')
-        .first()
+        .last()
+        .find('.checker')
+        .should('have.class', 'checker checked');
+
+        cy.get('.todo-item')
+        .last()
         .find('.checker')
         .click()
         .then(() => {
@@ -135,7 +196,13 @@ describe('Test todo', () => {
         })
     })
 
-    it('R8UC3 #1 attempting to delete todo item from todo list', () => {
+    it('R8UC3 #1 attempting to delete done todo item from todo list', () => {
+        // check that todo item is done/checked
+        cy.get('.todo-item')
+        .last()
+        .find('.checker')
+        .should('have.class', 'checker checked');
+
         cy.get('.todo-item')
         .last()
         .find('.remover')
@@ -146,13 +213,14 @@ describe('Test todo', () => {
         })
     })
 
-    after(function() {
-        // clean up by deleting the user from the database
-        cy.request({
-            method: 'DELETE',
-            url: `http://localhost:5000/users/${this.uid}`
-        }).then((response) => {
-            cy.log(response.body)
-        })
+})
+
+afterEach(function() {
+    // clean up by deleting the user from the database
+    cy.request({
+        method: 'DELETE',
+        url: `http://localhost:5000/users/${this.uid}`
+    }).then((response) => {
+        cy.log(response.body)
     })
 })
